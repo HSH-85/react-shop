@@ -1,4 +1,3 @@
-
 /* eslint no-restricted-globals: ["off"] */
 import { useParams } from "react-router-dom";
 import Discount from "./Discount";
@@ -6,8 +5,9 @@ import { useEffect, useState } from "react";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import axios from "axios";
-import { Row, Col } from "react-bootstrap";
-import Product from "../../component/Product"
+import { addCart } from "../../store";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function Detail(props) {
   let [alert, setAlert] = useState(true);
@@ -15,7 +15,8 @@ function Detail(props) {
   const [detail, setDetail] = useState([]);
   let imsi = [];
 
-  
+  let dispatch = useDispatch();
+  let navigate = useNavigate();
 
   // 2초 후에 alert state -> false
   useEffect(() => {
@@ -93,7 +94,11 @@ function Detail(props) {
             <p>{shoes.content}</p>
             <p>{strPrice}원</p>
 
-            <button className="btn btn-danger">주문하기</button>
+            <button className="btn btn-danger" 
+              onClick={()=>{
+                dispatch(addCart(shoes))
+                navigate('/cart')
+            }}>주문하기</button>
           </div>
 
           <Tabs

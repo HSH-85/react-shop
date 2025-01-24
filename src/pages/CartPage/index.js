@@ -1,6 +1,7 @@
+
 import Table from "react-bootstrap/Table";
 import { useDispatch, useSelector } from "react-redux";
-import { addAge, changeGroup, changeUserName, plusCount, minusCount } from "../../store";
+import { plusCount, minusCount, deleteCart, ascSort, descSort } from '../../store';
 
 function CartPage() {
   let userName = useSelector((state) => {
@@ -15,43 +16,62 @@ function CartPage() {
     return state.cartData;
   });
 
+  let totalPrice = 0;
+  for(let i=0; i < cartData.length; i++){
+    totalPrice = totalPrice + 
+      (cartData[i].count * cartData[i].price)
+  }
+  
+  console.log('totalPrice' , totalPrice)
+
+  totalPrice = totalPrice.toLocaleString("ko-KR")
+
   console.log(userName);
   console.log(productStock);
   console.log(cartData);
 
   // 스토어에 있는 변경함수 호출하는 택배기사를 생성
-  let dispatch = useDispatch();
+  let dispatcher = useDispatch();
   let loggindUser = useSelector((state) => {
     return state.loggindUser;
   });
-  console.log("Loggind userName = ", loggindUser);
+  console.log('Loggind userName = ' ,loggindUser);
 
-  let imsiData = useSelector((state) => {
+  let imsiData = useSelector((state)=>{
     return state.imsiData;
-  });
+  })
 
-  console.log(imsiData);
-
+  console.log(imsiData)
   return (
     <div>
-      {loggindUser}님의 장바구니
       {/* {loggindUser}<button onClick={()=>{
-        dispatch(changeUserName());
-      }}>이름변경</button>
-      {imsiData.name} : {imsiData.groupName}
+        dispatcher(changeUserName());
+      }}>이름실행</button>
+      {imsiData.groupName} : {imsiData.name}
       <button onClick={()=>{
-        dispatch(changeGroup())
+        dispatcher(changeGroup());
       }}>소속사</button>
       <span onClick={()=>{
-        dispatch(addAge(3));
+        dispatcher(addAge(3));
       }}>➕</span>{imsiData.age} */}
+      <p>{loggindUser}님</p>
       <Table>
         <thead>
           <tr>
             <th>#</th>
-            <th>상품명</th>
+            <th>
+              상품명
+              <span onClick={()=>{
+                dispatcher(ascSort())              
+              }}>▲</span>
+              <span onClick={()=>{
+                dispatcher(descSort())              
+              }} >▼</span>
+            </th>
+            <th>단가</th>
+            <th>금액</th>
             <th>수량</th>
-            <th>변경하기</th>
+            <th>삭제</th>
           </tr>
         </thead>
         <tbody>
@@ -60,24 +80,28 @@ function CartPage() {
               <tr key={x.id}>
                 <td>{x.id}</td>
                 <td>{x.title}</td>
-                <td>{x.count} &nbsp;
-                  <span onClick={() => {
-                      dispatch(plusCount(x.id));
-                    }}>
-                    ➕</span>
-                  <span
-                    onClick={() => {
-                      dispatch(minusCount(x.id));;
-                    }}
-                  >
-                    ➖
-                  </span>
+                <td>{x.price}</td>
+                <td>{x.price * x.count}</td>
+                <td>
+                  {x.count} &nbsp;
+                  <span onClick={()=>{
+                    dispatcher(plusCount(x.id))
+                  }}>➕</span>
+                  <span onClick={()=>{
+                    dispatcher(minusCount(x.id))
+                  }}>➖</span>
                 </td>
-
-                <td>단추</td>
+                
+                <td onClick={()=>{
+                  dispatcher(deleteCart(x.id))
+                }}>❌</td>
               </tr>
             );
           })}
+          <tr>
+            <td colSpan={4}>총 금액</td>
+            <td colSpan={2}> {totalPrice}원</td>
+          </tr>
         </tbody>
       </Table>
     </div>
